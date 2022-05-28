@@ -1,66 +1,122 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 
 import CardList from "./components/card-list/card-list.component.jsx";
 import SearchBox from "./components/search-box/search-box.component.jsx";
 import Card from "./components/card/card.component.jsx";
 import "./App.css";
 
-class App extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      monsters: [],
-      searchField: "",
+const App = () => {
+  const [searchField, setSearchField] = useState("");
+  const [monsters, setMonsters] = useState([]);
+  const [filterMonsters, setFilterMonsters] = useState(monsters);
+  // console.log("render");
+  useEffect(() => {
+    const generateData = async function () {
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users"
+      );
+      const data = await response.json();
+      setMonsters(data);
     };
-  }
+    generateData();
+    // fetch("https://jsonplaceholder.typicode.com/users")
+    //   .then((response) => response.json())
+    //   .then((users) => setMonsters(users));
+  }, []);
 
-  async componentDidMount() {
-    const response = await fetch("https://jsonplaceholder.typicode.com/users");
-    const data = await response.json();
-    this.setState(() => {
-      return { monsters: data };
+  useEffect(() => {
+    const newFilteredMonsters = monsters.filter((arr) => {
+      return arr.name.toLowerCase().includes(searchField);
     });
-  }
+    setFilterMonsters(newFilteredMonsters);
+  }, [monsters, searchField]);
 
-  onSearchChange = (event) => {
-    const searchField = event.target.value.toLowerCase();
+  // const filteredMonsters = monsters.filter((arr) => {
+  //   return arr.name.toLowerCase().includes(searchField);
+  // });
 
-    this.setState(() => {
-      return { searchField };
-    });
+  // console.log(filteredMonsters);
+
+  const onSearchChange = (event) => {
+    const searchFieldString = event.target.value.toLowerCase();
+    setSearchField(searchFieldString);
   };
+  // console.log(searchField);
 
-  render() {
-    const { monsters, searchField } = this.state;
-    const { onSearchChange } = this;
+  return (
+    <div className="App">
+      <h1 className="app-title">Monsters Rolodex</h1>
 
-    const filteredMonsters = monsters.filter((monster) => {
-      return monster.name.toLowerCase().includes(searchField);
-    });
+      <SearchBox
+        className="monsters-search-box"
+        onChangeHandler={onSearchChange}
+        placeholder="Search Monsters"
+      />
+      <CardList monsters={filterMonsters} />
+    </div>
+  );
+};
 
-    return (
-      <div className="App">
-        <h1 className="app-title">Monsters Rolodex</h1>
+// const pureFunction = (a, b) => {
+//   return a + b;
+// };
 
-        <SearchBox
-          onChangeHandler={onSearchChange}
-          placeholder="Search Monsters"
-          className="monsters-search-box"
-        />
-        <CardList monsters={filteredMonsters} />
-      </div>
-    );
-  }
-}
+// let c = 3;
+
+// const funcA = (a, b) => {
+//   return a + b + c;
+// };
+// console.log(funcA(3, 2));
+
+// const funcB = (a, b) => {
+//   c = a + b;
+
+//   return a * b;
+// };
+
+// funcB(2, 4);
+
+// class App extends Component {
+//   constructor() {
+//     super();
+
+//     this.state = {
+//       monsters: [],
+//       searchField: "",
+//     };
+//   }
+
+// async componentDidMount() {
+//   const response = await fetch("https://jsonplaceholder.typicode.com/users");
+//   const data = await response.json();
+//   this.setState(() => {
+//     return { monsters: data };
+//   });
+// }
+
+// onSearchChange = (event) => {
+//   const searchField = event.target.value.toLowerCase();
+
+//   this.setState(() => {
+//     return { searchField };
+//   });
+// };
+
+//   render() {
+//     const { monsters, searchField } = this.state;
+//     const { onSearchChange } = this;
+
+//     const filteredMonsters = monsters.filter((monster) => {
+//       return monster.name.toLowerCase().includes(searchField);
+//     });
+
+//     return (
+
+//     );
+//   }
+// }
 
 export default App;
-
-// const filteredMonsters = this.state.monsters.filter((arr) => {
-//   const name = arr.name.toLowerCase();
-//   const lName = name.includes(event.target.value);
-//   return lName;
-// });
 
 // {
 //   filteredMonsters.map((monster) => {
